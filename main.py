@@ -3,6 +3,43 @@ import numpy as np
 from numba import njit
 
 
+
+class Sprite:
+    def __init__(self, screen: pg.Surface, spritepic, x0, y0):
+        global posx, posy, rot, maph
+        self.screen = screen
+        self.x, self.y=x0, y0
+        self.diffspritean = 0
+        self.spritepic = pg.transform.scale(spritepic, (300, 300))
+        self.spritesize = np.asarray(self.spritepic.get_size())
+        self.newsprtie = self.spritepic
+        self.hor, self.vert =1000, 1000
+
+
+    def frame(self):
+        self.spritean = np.arctan((self.y - posy) / (self.x - posx))
+        if abs(posx + np.cos(self.spritean) - self.x) > abs(posx - self.x):
+            self.spritean = (self.spritean - np.pi) % (2 * np.pi)
+        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
+        if self.diffspritean > 11 * np.pi / 6 or self.diffspritean < np.pi / 6:
+            dist = np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
+            cos2 = np.cos(self.diffspritean)
+            cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
+            x, y = self.x, self.y
+            scaling = min(1 / dist, 2) / cos2
+            self.vert = 300 + 300 * scaling - scaling * self.spritesize[1] / 2
+            self.hor = 400 - 800 * np.sin(self.diffspritean) - scaling * self.spritesize[0] / 2
+            self.newsprtie = pg.transform.scale(self.spritepic, scaling * self.spritesize)
+            for i in range(int(dist / 0.01)):
+                x, y = x + cos, y + sin
+                if maph[int(x)][int(y)]:
+                    self.hor, self.vert = 1000, 1000
+            self.screen.blit(self.newsprtie, (self.hor, self.vert - 150*scaling))
+
+
+
+
+
 def main():
     pg.init()
     screen = pg.display.set_mode((800, 600))
@@ -23,8 +60,13 @@ def main():
     sky = pg.surfarray.array3d(pg.transform.scale(sky, (360, halfvres * 2))) / 255
     floor = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL87.bmp'), (300,300))) / 255
     wall = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL32.bmp'), (300,300))) / 255
+    pillarpic = pg.transform.scale(pg.image.load('pillar.png'), (400,400))
+    toilet = (pg.image.load('WALL30.bmp'))
+    toilet = pg.transform.scale(toilet, (300, 300))
+    toiletsize = np.asarray(toilet.get_size())
+    toiletx, toilety = 5,5
     pg.event.set_grab(1)
-
+    pillar = Sprite(screen, pillarpic, 3,3)
     while running:
         if int(posx) == exitx and int(posy) == exity:
             print("you got out of the maze!")
@@ -42,6 +84,28 @@ def main():
         pg.display.set_caption("Pycasting maze - FPS: " + str(fps))
 
         screen.blit(surf, (0, 0))
+
+        toiletan = np.arctan((toilety - posy)/(toiletx - posx))
+        if abs(posx+np.cos(toiletan) -toiletx) > abs(posx - toiletx):
+            toiletan = (toiletan - np.pi)%(2*np.pi)
+        difftoiletan = (rot - toiletan)%(2*np.pi)
+        if difftoiletan > 11*np.pi/6 or difftoiletan < np.pi/6:
+            dist = np.sqrt((posx-toiletx)**2 + (posy- toilety)**2)
+            cos2 = np.cos(difftoiletan)
+            cos, sin = 0.01*(posx - toiletx)/dist, 0.01*(posy - toilety)/dist
+            x, y = toiletx, toilety
+            scaling = min(1/dist, 2) / cos2
+            vert = 300 + 300*scaling - scaling*toiletsize[1]/2
+            hor = 400 - 800*np.sin(difftoiletan)- scaling*toiletsize[0]/2
+            toiletnew = pg.transform.scale(toilet, scaling*toiletsize)
+            for i in range(int(dist/0.01)):
+                x, y = x+cos, y+sin
+                if maph[int(x)][int(y)]:
+                    toiletnew = pg.transform.scale(toilet, (0,0))
+            screen.blit(toiletnew, (hor, vert))
+
+        pillar.frame()
+
         pg.display.update()
 
         posx, posy, rot = movement(posx, posy, rot, maph, clock.tick() / 500)
@@ -86,7 +150,7 @@ def gen_map(size):
     maph = np.random.choice([0, 0, 0, 0, 1, 1], (size, size))
     maph[0, :], maph[size - 1, :], maph[:, 0], maph[:, size - 1] = (1, 1, 1, 1)
     print(maph)
-    posx, posy, rot = 1.5, np.random.randint(1, size - 1) + .5, np.pi /2
+    posx, posy, rot = 1.5, 1.5, np.pi /2
 
     x, y = int(posx), int(posy)
     maph[x][y] = 0
@@ -153,7 +217,72 @@ def new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, siz
 
     return frame
 
+pg.init()
+screen = pg.display.set_mode((800, 600))
+running = True
+clock = pg.time.Clock()
+pg.mouse.set_visible(False)
 
-if __name__ == '__main__':
-    main()
-    pg.quit()
+hres = 200  # horizontal resolution
+halfvres = 150  # vertical resolution/2
+
+mod = hres / 60  # scaling factor (60° fov)
+
+size = 8
+posx, posy, rot, maph, exitx, exity = gen_map(size)
+
+frame = np.random.uniform(0, 1, (hres, halfvres * 2, 3))
+sky = pg.image.load('WALL30.bmp')
+sky = pg.surfarray.array3d(pg.transform.scale(sky, (360, halfvres * 2))) / 255
+floor = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL87.bmp'), (300,300))) / 255
+wall = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL32.bmp'), (300,300))) / 255
+pillarpic = pg.transform.scale(pg.image.load('pillar.png'), (300,300))
+toilet = (pg.image.load('WALL30.bmp'))
+toilet = pg.transform.scale(toilet, (300, 300))
+toiletsize = np.asarray(toilet.get_size())
+toiletx, toilety = 5,5
+pg.event.set_grab(1)
+pillar = Sprite(screen, pillarpic, 3,3)
+while running:
+    if int(posx) == exitx and int(posy) == exity:
+        print("you got out of the maze!")
+        running = False
+    for event in pg.event.get():
+        if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            running = False
+
+    frame = new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, size,
+                      wall, exitx, exity)
+
+    surf = pg.surfarray.make_surface(frame * 255)
+    surf = pg.transform.scale(surf, (800, 600))
+    fps = int(clock.get_fps())
+    pg.display.set_caption("Pycasting maze - FPS: " + str(fps))
+
+    screen.blit(surf, (0, 0))
+
+    '''toiletan = np.arctan((toilety - posy)/(toiletx - posx))
+        if abs(posx+np.cos(toiletan) -toiletx) > abs(posx - toiletx):
+            toiletan = (toiletan - np.pi)%(2*np.pi)
+        difftoiletan = (rot - toiletan)%(2*np.pi)
+        if difftoiletan > 11*np.pi/6 or difftoiletan < np.pi/6:
+            dist = np.sqrt((posx-toiletx)**2 + (posy- toilety)**2)
+            cos2 = np.cos(difftoiletan)
+            cos, sin = 0.01*(posx - toiletx)/dist, 0.01*(posy - toilety)/dist
+            x, y = toiletx, toilety
+            scaling = min(1/dist, 2) / cos2
+            vert = 300 + 300*scaling - scaling*toiletsize[1]/2
+            hor = 400 - 800*np.sin(difftoiletan)- scaling*toiletsize[0]/2
+            toiletnew = pg.transform.scale(toilet, scaling*toiletsize)
+            for i in range(int(dist/0.01)):
+                x, y = x+cos, y+sin
+                if maph[int(x)][int(y)]:
+                    toiletnew = pg.transform.scale(toilet, (0,0))
+            screen.blit(toiletnew, (hor, vert))'''
+
+    pillar.frame()
+    pg.display.update()
+
+    posx, posy, rot = movement(posx, posy, rot, maph, clock.tick() / 500)
+
+pg.quit()
