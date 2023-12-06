@@ -74,6 +74,34 @@ class Enemy:
 
 
 
+class Weapon:
+    def __init__(self, screen: pg.Surface, weaponsheet, x0, y0):
+        global posx, posy, rot, maph, ticks
+        self.screen = screen
+        self.diffspritean = 0
+        self.weaponsheet = weaponsheet
+        self.newsprtie = self.weaponsheet[0]
+        self.hor, self.vert = x0, y0
+        self.shooting = False
+
+        self.time = 0
+        self.cycle = 0
+
+    def frame(self):
+        self.newsprtie = self.weaponsheet[0]
+
+        if self.shooting and self.time < 20:
+            self.newsprtie = self.weaponsheet[1]
+            self.time+=1
+        if self.shooting and self.time > 20:
+            self.time = 0
+            self.shooting=False
+            self.newsprtie = self.weaponsheet[0]
+        self.screen.blit(self.newsprtie, (self.hor, self.vert))
+
+    def shoot(self):
+        self.shooting = True
+        self.time = 0
 
 
 def get_spritesheet(sheet, width,height, n, m):
@@ -101,11 +129,11 @@ def movement(posx, posy, rot, maph, et):
         x, y, diag = x - et * np.cos(rot), y - et * np.sin(rot), 1
 
     if pressed_keys[pg.K_LEFT] or pressed_keys[ord('a')]:
-        et = et / (diag + 1)
+        #et = et / (diag + 1)
         x, y = x + et * np.sin(rot), y - et * np.cos(rot)
 
     elif pressed_keys[pg.K_RIGHT] or pressed_keys[ord('d')]:
-        et = et / (diag + 1)
+        #et = et / (diag + 1)
         x, y = x - et * np.sin(rot), y + et * np.cos(rot)
 
     if not (maph[int(x - 0.2)][int(y)] or maph[int(x + 0.2)][int(y)] or
@@ -124,9 +152,18 @@ def movement(posx, posy, rot, maph, et):
 
 
 def gen_map(size):
+    maph = np.array([[1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1]])
+    '''
     maph = np.random.choice([0, 0, 0, 0, 1, 1], (size, size))
-    maph[0, :], maph[size - 1, :], maph[:, 0], maph[:, size - 1] = (1, 1, 1, 1)
-    print(maph)
+    maph[0, :], maph[size - 1, :], maph[:, 0], maph[:, size - 1] = (1, 1, 1, 1)'''
+    print(type(maph))
     posx, posy, rot = 1.5, 1.5, np.pi /2
 
     x, y = int(posx), int(posy)
@@ -219,6 +256,9 @@ pillarpic = pg.transform.scale(pg.image.load('pillar.png'), (300,300))
 enemypic = pg.image.load('27846.png')
 enemy = get_spritesheet(enemypic, 64, 64, 8, 7)
 
+weaponsheet = [pg.image.load('WALL32.bmp'), pg.image.load('pillar.png')]
+weapontest = Weapon(screen,weaponsheet, 30, 100)
+
 e1 = Enemy(screen, enemy, 2, 2)
 
 pg.event.set_grab(1)
@@ -231,6 +271,10 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
             running = False
+        if event.type == pg.MOUSEBUTTONDOWN:
+            weapontest.shoot()
+
+
 
     frame = new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, size,
                       wall, exitx, exity)
@@ -263,8 +307,10 @@ while running:
 
     pillar.frame()
     e1.frame()
+    weapontest.frame()
     pg.display.update()
 
-    posx, posy, rot = movement(posx, posy, rot, maph, clock.tick() / 500)
+    posx, posy, rot = movement(posx, posy, rot, maph, 0.02)
+    clock.tick(60)
 
 pg.quit()
