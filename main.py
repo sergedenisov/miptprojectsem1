@@ -44,15 +44,17 @@ class Enemy:
         self.x, self.y=x0, y0
         self.diffspritean = 0
         self.spritesheet = spritesheet
-        self.spritesize = np.asarray(self.spritesheet[0][0].get_size())
-        self.newsprtie = self.spritesheet[0][0]
+        self.spritesize = np.asarray(self.spritesheet[0].get_size())
+        self.newsprtie = self.spritesheet[0]
         self.hor, self.vert =1000, 1000
+
+        self.alive = True
 
         self.cycle = 0
 
 
     def frame(self):
-        self.cycle = int(ticks)%3
+        self.cycle = int(ticks)%4
         self.spritean = np.arctan((self.y - posy) / (self.x - posx))
         if abs(posx + np.cos(self.spritean) - self.x) > abs(posx - self.x):
             self.spritean = (self.spritean - np.pi) % (2 * np.pi)
@@ -65,12 +67,27 @@ class Enemy:
             scaling = min(1 / dist, 2) / cos2
             self.vert = 300 + 300 * scaling - scaling * self.spritesize[1]
             self.hor = 400 - 800 * np.sin(self.diffspritean) - scaling * self.spritesize[0] / 2
-            self.newsprtie = pg.transform.scale(self.spritesheet[0][self.cycle+1], scaling * self.spritesize)
+            if self.alive:
+                self.spritesize = np.asarray(self.spritesheet[self.cycle].get_size())
+
+                self.newsprtie = pg.transform.scale(self.spritesheet[self.cycle], scaling * self.spritesize)
+            else:
+                self.spritesize = np.asarray(self.spritesheet[4].get_size())
+
+                self.newsprtie = pg.transform.scale(self.spritesheet[4], scaling * self.spritesize)
+
             for i in range(int(dist / 0.01)):
                 x, y = x + cos, y + sin
                 if maph[int(x)][int(y)]:
                     self.hor, self.vert = 1000, 1000
             self.screen.blit(self.newsprtie, (self.hor, self.vert))
+    def hittest(self):
+        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
+        if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
+            self.alive = False
+
+
+
 
 
 
@@ -90,10 +107,10 @@ class Weapon:
     def frame(self):
         self.newsprtie = self.weaponsheet[0]
 
-        if self.shooting and self.time < 20:
+        if self.shooting and self.time < 10:
             self.newsprtie = self.weaponsheet[1]
             self.time+=1
-        if self.shooting and self.time > 20:
+        if self.shooting and self.time > 10:
             self.time = 0
             self.shooting=False
             self.newsprtie = self.weaponsheet[0]
@@ -104,16 +121,7 @@ class Weapon:
         self.time = 0
 
 
-def get_spritesheet(sheet, width,height, n, m):
-    sprites = [[]]
-    for i in range(n):
-        xx = i*width
-        sprites.append([])
-        for j in range(m):
-            yy = j*height
 
-            sprites[i].append(pg.transform.scale(pg.Surface.subsurface(sheet, (xx,yy,width,height)), (500, 500)))
-    return sprites
 
 
 def movement(posx, posy, rot, maph, et):
@@ -254,12 +262,12 @@ floor = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL87.bmp'), (30
 wall = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL32.bmp'), (300,300))) / 255
 pillarpic = pg.transform.scale(pg.image.load('pillar.png'), (300,300))
 enemypic = pg.image.load('27846.png')
-enemy = get_spritesheet(enemypic, 64, 64, 8, 7)
+enemysheet = [pg.transform.scale(pg.image.load('testenemy/1.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/2.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/3.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/4.png'),(200, 300)) , pg.transform.scale(pg.image.load('testenemy/5.png'),(150, 200))]
 
-weaponsheet = [pg.image.load('WALL32.bmp'), pg.image.load('pillar.png')]
-weapontest = Weapon(screen,weaponsheet, 30, 100)
+weaponsheet = [pg.transform.scale(pg.image.load('1.png'),(150, 150)), pg.transform.scale(pg.image.load('2.png'),(150, 150))]
+weapontest = Weapon(screen,weaponsheet, 350, 450)
 
-e1 = Enemy(screen, enemy, 2, 2)
+e1 = Enemy(screen, enemysheet, 2, 2)
 
 pg.event.set_grab(1)
 pillar = Sprite(screen, pillarpic, 3,3)
@@ -273,6 +281,7 @@ while running:
             running = False
         if event.type == pg.MOUSEBUTTONDOWN:
             weapontest.shoot()
+            e1.hittest()
 
 
 
