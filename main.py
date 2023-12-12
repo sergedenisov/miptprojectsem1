@@ -37,55 +37,6 @@ class Sprite:
                     self.hor, self.vert = 1000, 1000
             self.screen.blit(self.newsprtie, (self.hor, self.vert))
 
-class Enemy:
-    def __init__(self, screen: pg.Surface, spritesheet, x0, y0):
-        global posx, posy, rot, maph, ticks
-        self.screen = screen
-        self.x, self.y=x0, y0
-        self.diffspritean = 0
-        self.spritesheet = spritesheet
-        self.spritesize = np.asarray(self.spritesheet[0].get_size())
-        self.newsprtie = self.spritesheet[0]
-        self.hor, self.vert =1000, 1000
-
-        self.alive = True
-
-        self.cycle = 0
-
-
-    def frame(self):
-        self.cycle = int(ticks)%4
-        self.spritean = np.arctan((self.y - posy) / (self.x - posx))
-        if abs(posx + np.cos(self.spritean) - self.x) > abs(posx - self.x):
-            self.spritean = (self.spritean - np.pi) % (2 * np.pi)
-        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
-        if self.diffspritean > 11 * np.pi / 6 or self.diffspritean < np.pi / 6:
-            dist = np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
-            cos2 = np.cos(self.diffspritean)
-            cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
-            x, y = self.x, self.y
-            scaling = min(1 / dist, 2) / cos2
-            self.vert = 300 + 300 * scaling - scaling * self.spritesize[1]
-            self.hor = 400 - 800 * np.sin(self.diffspritean) - scaling * self.spritesize[0] / 2
-            if self.alive:
-                self.spritesize = np.asarray(self.spritesheet[self.cycle].get_size())
-
-                self.newsprtie = pg.transform.scale(self.spritesheet[self.cycle], scaling * self.spritesize)
-            else:
-                self.spritesize = np.asarray(self.spritesheet[4].get_size())
-
-                self.newsprtie = pg.transform.scale(self.spritesheet[4], scaling * self.spritesize)
-
-            for i in range(int(dist / 0.01)):
-                x, y = x + cos, y + sin
-                if maph[int(x)][int(y)]:
-                    self.hor, self.vert = 1000, 1000
-            self.screen.blit(self.newsprtie, (self.hor, self.vert))
-    def hittest(self):
-        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
-        if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
-            self.alive = False
-
 
 
 class Enemy:
@@ -151,7 +102,10 @@ class Enemy:
         self.diffspritean = (rot - self.spritean) % (2 * np.pi)
         if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
             self.alive = False
-
+    def distance(self):
+        return np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
+    def isalive(self):
+        return self.alive
 
 
 
@@ -421,6 +375,10 @@ mod = hres / 60  # scaling factor (60° fov)
 
 size = 8
 posx, posy, rot, maph, exitx, exity = gen_map(size)
+health = 100
+pg.font.init()
+font = pg.font.SysFont('Comic Sans MS', 30)
+hptext = font.render('HP: %d' % health, False, (0, 0, 0))
 
 frame = np.random.uniform(0, 1, (hres, halfvres * 2, 3))
 sky = pg.image.load('WALL30.bmp')
@@ -442,8 +400,12 @@ e3 = GOBLIN(screen, enemysheetG, 4, 2)
 
 pg.event.set_grab(1)
 pillar = Sprite(screen, pillarpic, 3,3)
+globaltime = 0
 while running:
     ticks = pg.time.get_ticks() / 200
+    globaltime+=1
+    globaltime%=60
+
     if int(posx) == exitx and int(posy) == exity:
         print("you got out of the maze!")
         running = False
@@ -492,6 +454,12 @@ while running:
     e2.frame()
     e3.frame()
     weapontest.frame()
+    if e1.isalive() and e1.distance() <= 1 and globaltime%20 == 0:
+        health -= 1
+    hptext = font.render('HP: %d' % health, False, (0, 0, 0))
+
+    screen.blit(hptext, (20, 550))
+
     pg.display.update()
 
     posx, posy, rot = movement(posx, posy, rot, maph, 0.04)
