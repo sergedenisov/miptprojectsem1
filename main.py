@@ -93,6 +93,7 @@ class Enemy:
         global posx, posy, rot, maph, ticks
         self.screen = screen
         self.x, self.y = x0, y0
+        self.rayx, self.rayy = posx, posy
         self.diffspritean = 0
         self.spritesheet = spritesheet
         self.spritesize = np.asarray(self.spritesheet[0].get_size())
@@ -100,12 +101,14 @@ class Enemy:
         self.hor, self.vert =1000, 1000
 
         self.alive = True
+        self.see = False
 
         self.cycle = 0
 
 
     def frame(self):
         self.cycle = int(ticks)%4
+        self.rayx, self.rayy = posx, posy
         self.spritean = np.arctan((self.y - posy) / (self.x - posx))
         if abs(posx + np.cos(self.spritean) - self.x) > abs(posx - self.x):
             self.spritean = (self.spritean - np.pi) % (2 * np.pi)
@@ -126,16 +129,29 @@ class Enemy:
                 self.spritesize = np.asarray(self.spritesheet[4].get_size())
 
                 self.newsprtie = pg.transform.scale(self.spritesheet[4], scaling * self.spritesize)
-
+            self.see=True
             for i in range(int(dist / 0.01)):
                 x, y = x + cos, y + sin
                 if maph[int(x)][int(y)]:
                     self.hor, self.vert = 1000, 1000
+                    self.see = False
+
             self.screen.blit(self.newsprtie, (self.hor, self.vert))
+        dist = np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
+        if self.see and self.alive and dist>0.5 and maph[int(self.x)][int(self.y)]==0:
+            cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
+            self.x += cos
+            self.y += sin
+            print(maph[int(self.x)][int(self.y)])
+        if maph[int(self.x)][int(self.y)] !=0:
+            self.x -= 3*cos
+            self.y -= 3*sin
+
     def hittest(self):
         self.diffspritean = (rot - self.spritean) % (2 * np.pi)
         if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
             self.alive = False
+
 
 
 
@@ -315,7 +331,7 @@ def gen_map(size):
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 1, 1, 1, 1, 1, 1, 1]])
@@ -478,7 +494,7 @@ while running:
     weapontest.frame()
     pg.display.update()
 
-    posx, posy, rot = movement(posx, posy, rot, maph, 0.02)
+    posx, posy, rot = movement(posx, posy, rot, maph, 0.04)
     clock.tick(60)
 
 pg.quit()
