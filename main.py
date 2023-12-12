@@ -13,7 +13,7 @@ class Sprite:
         self.spritepic = pg.transform.scale(spritepic, (300, 300))
         self.spritesize = np.asarray(self.spritepic.get_size())
         self.newsprtie = self.spritepic
-        self.hor, self.vert =1000, 1000
+        self.hor, self.vert = 1000, 1000
 
 
 
@@ -88,6 +88,157 @@ class Enemy:
 
 
 
+class Enemy:
+    def __init__(self, screen: pg.Surface, spritesheet, x0, y0):
+        global posx, posy, rot, maph, ticks
+        self.screen = screen
+        self.x, self.y = x0, y0
+        self.diffspritean = 0
+        self.spritesheet = spritesheet
+        self.spritesize = np.asarray(self.spritesheet[0].get_size())
+        self.newsprtie = self.spritesheet[0]
+        self.hor, self.vert =1000, 1000
+
+        self.alive = True
+
+        self.cycle = 0
+
+
+    def frame(self):
+        self.cycle = int(ticks)%4
+        self.spritean = np.arctan((self.y - posy) / (self.x - posx))
+        if abs(posx + np.cos(self.spritean) - self.x) > abs(posx - self.x):
+            self.spritean = (self.spritean - np.pi) % (2 * np.pi)
+        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
+        if self.diffspritean > 11 * np.pi / 6 or self.diffspritean < np.pi / 6:
+            dist = np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
+            cos2 = np.cos(self.diffspritean)
+            cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
+            x, y = self.x, self.y
+            scaling = min(1 / dist, 2) / cos2
+            self.vert = 300 + 300 * scaling - scaling * self.spritesize[1]
+            self.hor = 400 - 800 * np.sin(self.diffspritean) - scaling * self.spritesize[0] / 2
+            if self.alive:
+                self.spritesize = np.asarray(self.spritesheet[self.cycle].get_size())
+
+                self.newsprtie = pg.transform.scale(self.spritesheet[self.cycle], scaling * self.spritesize)
+            else:
+                self.spritesize = np.asarray(self.spritesheet[4].get_size())
+
+                self.newsprtie = pg.transform.scale(self.spritesheet[4], scaling * self.spritesize)
+
+            for i in range(int(dist / 0.01)):
+                x, y = x + cos, y + sin
+                if maph[int(x)][int(y)]:
+                    self.hor, self.vert = 1000, 1000
+            self.screen.blit(self.newsprtie, (self.hor, self.vert))
+    def hittest(self):
+        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
+        if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
+            self.alive = False
+
+
+
+
+class HITLER:
+    def __init__(self, screen: pg.Surface, spritesheetH, x0, y0):
+        global posx, posy, rot, maph, ticks
+        self.screen = screen
+        self.x, self.y=x0, y0
+        self.diffspritean = 0
+        self.spritesheet = spritesheetH
+        self.spritesize = np.asarray(self.spritesheet[0].get_size())
+        self.newsprtie = self.spritesheet[0]
+        self.hor, self.vert = 1000, 1000
+
+        self.alive = True
+
+        self.cycle = 0
+
+
+    def frame(self):
+        self.cycle = int(ticks)%7
+        self.spritean = np.arctan((self.y - posy) / (self.x - posx))
+        if abs(posx + np.cos(self.spritean) - self.x) > abs(posx - self.x):
+            self.spritean = (self.spritean - np.pi) % (2 * np.pi)
+        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
+        if self.diffspritean > 11 * np.pi / 6 or self.diffspritean < np.pi / 6:
+            dist = np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
+            cos2 = np.cos(self.diffspritean)
+            cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
+            x, y = self.x, self.y
+            scaling = min(1 / dist, 2) / cos2
+            self.vert = 300 + 300 * scaling - scaling * self.spritesize[1]
+            self.hor = 400 - 800 * np.sin(self.diffspritean) - scaling * self.spritesize[0] / 2
+            if self.alive:
+                self.spritesize = np.asarray(self.spritesheet[self.cycle].get_size())
+
+                self.newsprtie = pg.transform.scale(self.spritesheet[self.cycle], scaling * self.spritesize)
+            else:
+                self.spritesize = np.asarray(self.spritesheet[7].get_size())
+
+                self.newsprtie = pg.transform.scale(self.spritesheet[7], scaling * self.spritesize)
+
+            for i in range(int(dist / 0.01)):
+                x, y = x + cos, y + sin
+                if maph[int(x)][int(y)]:
+                    self.hor, self.vert = 1000, 1000
+            self.screen.blit(self.newsprtie, (self.hor, self.vert))
+    def hittest(self):
+        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
+        if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
+            self.alive = False
+
+
+
+class GOBLIN:
+    def __init__(self, screen: pg.Surface, spritesheetG, x0, y0):
+        global posx, posy, rot, maph, ticks
+        self.screen = screen
+        self.x, self.y=x0, y0
+        self.diffspritean = 0
+        self.spritesheet = spritesheetG
+        self.spritesize = np.asarray(self.spritesheet[0].get_size())
+        self.newsprtie = self.spritesheet[0]
+        self.hor, self.vert = 1000, 1000
+
+        self.alive = True
+
+        self.cycle = 0
+
+
+    def frame(self):
+        self.cycle = int(ticks)%4
+        self.spritean = np.arctan((self.y - posy) / (self.x - posx))
+        if abs(posx + np.cos(self.spritean) - self.x) > abs(posx - self.x):
+            self.spritean = (self.spritean - np.pi) % (2 * np.pi)
+        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
+        if self.diffspritean > 11 * np.pi / 6 or self.diffspritean < np.pi / 6:
+            dist = np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
+            cos2 = np.cos(self.diffspritean)
+            cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
+            x, y = self.x, self.y
+            scaling = min(1 / dist, 2) / cos2
+            self.vert = 300 + 300 * scaling - scaling * self.spritesize[1]
+            self.hor = 400 - 800 * np.sin(self.diffspritean) - scaling * self.spritesize[0] / 2
+            if self.alive:
+                self.spritesize = np.asarray(self.spritesheet[self.cycle].get_size())
+
+                self.newsprtie = pg.transform.scale(self.spritesheet[self.cycle], scaling * self.spritesize)
+            else:
+                self.spritesize = np.asarray(self.spritesheet[4].get_size())
+
+                self.newsprtie = pg.transform.scale(self.spritesheet[4], scaling * self.spritesize)
+
+            for i in range(int(dist / 0.01)):
+                x, y = x + cos, y + sin
+                if maph[int(x)][int(y)]:
+                    self.hor, self.vert = 1000, 1000
+            self.screen.blit(self.newsprtie, (self.hor, self.vert))
+    def hittest(self):
+        self.diffspritean = (rot - self.spritean) % (2 * np.pi)
+        if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
+            self.alive = False
 
 
 
@@ -263,11 +414,15 @@ wall = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL32.bmp'), (300
 pillarpic = pg.transform.scale(pg.image.load('pillar.png'), (300,300))
 enemypic = pg.image.load('27846.png')
 enemysheet = [pg.transform.scale(pg.image.load('testenemy/1.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/2.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/3.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/4.png'),(200, 300)) , pg.transform.scale(pg.image.load('testenemy/5.png'),(150, 200))]
+enemysheetH = [pg.transform.scale(pg.image.load('HITLER/1.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/2.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/3.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/4.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/5.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/6.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/7.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/8.png'),(200, 300))]
+enemysheetG = [pg.transform.scale(pg.image.load('enemys/1.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/2.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/3.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/4.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/5.png'),(200, 300))]
 
 weaponsheet = [pg.transform.scale(pg.image.load('1.png'),(150, 150)), pg.transform.scale(pg.image.load('2.png'),(150, 150))]
 weapontest = Weapon(screen,weaponsheet, 350, 450)
 
 e1 = Enemy(screen, enemysheet, 2, 2)
+e2 = HITLER(screen, enemysheetH, 5,5)
+e3 = GOBLIN(screen, enemysheetG, 4, 2)
 
 pg.event.set_grab(1)
 pillar = Sprite(screen, pillarpic, 3,3)
@@ -282,6 +437,8 @@ while running:
         if event.type == pg.MOUSEBUTTONDOWN:
             weapontest.shoot()
             e1.hittest()
+            e2.hittest()
+            e3.hittest()
 
 
 
@@ -316,6 +473,8 @@ while running:
 
     pillar.frame()
     e1.frame()
+    e2.frame()
+    e3.frame()
     weapontest.frame()
     pg.display.update()
 
