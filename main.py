@@ -115,6 +115,7 @@ class HITLER:
         global posx, posy, rot, maph, ticks
         self.screen = screen
         self.x, self.y=x0, y0
+        self.health = 5
         self.diffspritean = 0
         self.spritesheet = spritesheetH
         self.spritesize = np.asarray(self.spritesheet[0].get_size())
@@ -157,6 +158,8 @@ class HITLER:
     def hittest(self):
         self.diffspritean = (rot - self.spritean) % (2 * np.pi)
         if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
+            self.health -= 1
+        if self.health == 0:
             self.alive = False
 
 
@@ -166,6 +169,7 @@ class GOBLIN:
         global posx, posy, rot, maph, ticks
         self.screen = screen
         self.x, self.y=x0, y0
+        self.health = 2
         self.diffspritean = 0
         self.spritesheet = spritesheetG
         self.spritesize = np.asarray(self.spritesheet[0].get_size())
@@ -208,6 +212,8 @@ class GOBLIN:
     def hittest(self):
         self.diffspritean = (rot - self.spritean) % (2 * np.pi)
         if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
+            self.health -=1
+        if self.health == 0:
             self.alive = False
 
 
