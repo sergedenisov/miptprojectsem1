@@ -168,7 +168,7 @@ class HITLER:
 
     def move_circle(self):
 
-        center_x, center_y = 5, 5
+        center_x, center_y = 7, 6
 
         radius = 0.5
 
@@ -374,11 +374,11 @@ def gen_map2(size):
             [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
             [1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
             [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
-            [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+            [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1],
-            [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
             [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1],
             [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1],
             [1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
@@ -548,7 +548,7 @@ barrelpic = pg.transform.scale(pg.image.load('barrel.png'), (300,300))
 medicinepic = pg.transform.scale(pg.image.load('medicine.png'), (300,300))
 enemypic = pg.image.load('27846.png')
 enemysheet = [pg.transform.scale(pg.image.load('testenemy/1.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/2.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/3.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/4.png'),(200, 300)) , pg.transform.scale(pg.image.load('testenemy/5.png'),(150, 200))]
-enemysheetH = [pg.transform.scale(pg.image.load('HITLER/1.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/2.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/3.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/4.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/5.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/6.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/7.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/8.png'),(200, 300))]
+enemysheetH = [pg.transform.scale(pg.image.load('HITLER/1.png'),(400, 600)), pg.transform.scale(pg.image.load('HITLER/2.png'),(400, 600)), pg.transform.scale(pg.image.load('HITLER/3.png'),(400, 600)), pg.transform.scale(pg.image.load('HITLER/4.png'),(400, 600)), pg.transform.scale(pg.image.load('HITLER/5.png'),(400, 600)), pg.transform.scale(pg.image.load('HITLER/6.png'),(400, 600)), pg.transform.scale(pg.image.load('HITLER/7.png'),(400, 600)), pg.transform.scale(pg.image.load('HITLER/8.png'),(400, 600))]
 enemysheetG = [pg.transform.scale(pg.image.load('enemys/1.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/2.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/3.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/4.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/5.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/7.png'),(200, 300))]
 
 """weaponsheet = [pg.transform.scale(pg.image.load('1.png'),(150, 150)), pg.transform.scale(pg.image.load('2.png'),(150, 150))]
@@ -566,7 +566,7 @@ weapons_dict = {
 weapon = Weapon(screen, weapons_dict, 350, 450)
 
 e1 = Enemy(screen, enemysheet, 2, 2)
-e2 = HITLER(screen, enemysheetH, 5,5)
+e2 = HITLER(screen, enemysheetH, 20,20)
 e3 = GOBLIN(screen, enemysheetG, 4, 2)
 
 enemylist1 = [Enemy(screen, enemysheet, 2, 9), Enemy(screen, enemysheet, 1, 9), Enemy(screen, enemysheet, 2, 4), Enemy(screen, enemysheet, 18, 18), Enemy(screen, enemysheet, 6, 18), Enemy(screen, enemysheet, 6, 7), Enemy(screen, enemysheet, 18, 13), Enemy(screen, enemysheet, 18, 7), GOBLIN(screen, enemysheetG, 13, 9), GOBLIN(screen, enemysheetG, 14, 2), GOBLIN(screen, enemysheetG, 11, 9), GOBLIN(screen, enemysheetG, 11, 18)]
@@ -590,6 +590,10 @@ menu3 = font.render('Авторы игры: Денисов Сергей Б02-309
 menu4 = font.render('Наумов Максим Б02-301,', False, (0, 0, 0))
 menu5 = font.render('Стефанов Никита Б02-302', False, (0, 0, 0))
 menu6 = font.render('Нажмите на esc чтобы выйти из игры.', False, (0, 0, 0))
+
+
+pg.mixer.music.load('Was_wollen_wir_trinken.mp3')
+pg.mixer.music.play()
 
 while runningmenu:
     screen.fill((255, 0,0))
@@ -667,7 +671,6 @@ while running:
             for i in enemylist1:
                 i.hittest()
             e1.hittest()
-            e2.hittest()
             e3.hittest()
 
 
@@ -703,7 +706,6 @@ while running:
     medicine2.frame()
     medicine3.frame()
     e1.frame()
-    e2.frame()
     e3.frame()
     weapon.frame()
 
