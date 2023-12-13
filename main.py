@@ -292,28 +292,33 @@ class GOBLIN:
 
 
 class Weapon:
-    def __init__(self, screen: pg.Surface, weaponsheet, x0, y0):
-        global posx, posy, rot, maph, ticks
+    def __init__(self, screen: pg.Surface, weaponsheet_dict, x0, y0):
         self.screen = screen
-        self.diffspritean = 0
-        self.weaponsheet = weaponsheet
-        self.newsprtie = self.weaponsheet[0]
+        self.weaponsheet_dict = weaponsheet_dict
+        self.current_weapon = '2'
+        self.newsprites = self.weaponsheet_dict[self.current_weapon]
+        self.newsprtie = self.newsprites[0]
         self.hor, self.vert = x0, y0
         self.shooting = False
 
         self.time = 0
         self.cycle = 0
 
-    def frame(self):
-        self.newsprtie = self.weaponsheet[0]
+    def change_weapon(self, weapon_id):
+        print(f"Переключение на оружие {weapon_id}")
+        self.current_weapon = weapon_id
+        self.newsprites = self.weaponsheet_dict[weapon_id]
 
+    def frame(self):
         if self.shooting and self.time < 10:
-            self.newsprtie = self.weaponsheet[1]
-            self.time+=1
-        if self.shooting and self.time > 10:
+            self.newsprtie = self.newsprites[1]
+            self.time += 1
+        elif self.shooting and self.time >= 10:
             self.time = 0
-            self.shooting=False
-            self.newsprtie = self.weaponsheet[0]
+            self.shooting = False
+            self.newsprtie = self.newsprites[0]
+
+        self.newsprtie = self.newsprites[0 if not self.shooting else 1]
         self.screen.blit(self.newsprtie, (self.hor, self.vert))
 
     def shoot(self):
@@ -546,8 +551,19 @@ enemysheet = [pg.transform.scale(pg.image.load('testenemy/1.png'),(200, 300)), p
 enemysheetH = [pg.transform.scale(pg.image.load('HITLER/1.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/2.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/3.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/4.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/5.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/6.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/7.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/8.png'),(200, 300))]
 enemysheetG = [pg.transform.scale(pg.image.load('enemys/1.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/2.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/3.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/4.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/5.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/7.png'),(200, 300))]
 
-weaponsheet = [pg.transform.scale(pg.image.load('1.png'),(150, 150)), pg.transform.scale(pg.image.load('2.png'),(150, 150))]
-weapontest = Weapon(screen,weaponsheet, 350, 450)
+"""weaponsheet = [pg.transform.scale(pg.image.load('1.png'),(150, 150)), pg.transform.scale(pg.image.load('2.png'),(150, 150))]
+weapontest = Weapon(screen,weaponsheet, 350, 450)"""
+
+weaponsheet1 = [pg.transform.scale(pg.image.load('1A.png'), (150, 150)),pg.transform.scale(pg.image.load('2A.png'), (150, 150))]
+
+weaponsheet2 = [pg.transform.scale(pg.image.load('1B.png'), (150, 150)),pg.transform.scale(pg.image.load('2B.png'), (150, 150))]
+
+weapons_dict = {
+    '1': weaponsheet1,
+    '2': weaponsheet2
+}
+
+weapon = Weapon(screen, weapons_dict, 350, 450)
 
 e1 = Enemy(screen, enemysheet, 2, 2)
 e2 = HITLER(screen, enemysheetH, 5,5)
@@ -635,13 +651,19 @@ while running:
         if (posx - m.x) ** 2 + (posy - m.y) ** 2 <= 1:
             health -= rnd(10, 50)
             m.reposition()
-            
 
     for event in pg.event.get():
         if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
             running = False
+
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_1:
+                weapon.change_weapon('1')
+            elif event.key == pg.K_2:
+                weapon.change_weapon('2')
+
         if event.type == pg.MOUSEBUTTONDOWN:
-            weapontest.shoot()
+            weapon.shoot()
             for i in enemylist1:
                 i.hittest()
             e1.hittest()
@@ -683,7 +705,7 @@ while running:
     e1.frame()
     e2.frame()
     e3.frame()
-    weapontest.frame()
+    weapon.frame()
 
     if e1.isalive() and e1.distance() <= 1 and globaltime%20 == 0:
         health -= 1
@@ -765,8 +787,15 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
             running = False
+
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_1:
+                weapon.change_weapon('1')
+            elif event.key == pg.K_2:
+                weapon.change_weapon('2')
+
         if event.type == pg.MOUSEBUTTONDOWN:
-            weapontest.shoot()
+            weapon.shoot()
             for i in enemylist1:
                 i.hittest()
             e1.hittest()
@@ -803,7 +832,7 @@ while running:
     e1.frame()
     e2.frame()
     e3.frame()
-    weapontest.frame()
+    weapon.frame()
 
     if e1.isalive() and e1.distance() <= 1 and globaltime%20 == 0:
         health -= 1
