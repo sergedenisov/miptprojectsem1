@@ -427,6 +427,30 @@ e3 = GOBLIN(screen, enemysheetG, 4, 2)
 pg.event.set_grab(1)
 pillar = Sprite(screen, pillarpic, 3,3)
 globaltime = 0
+runningmenu = True
+menu1 = font.render('RayCasting игра', False, (0, 0, 0))
+menu2 = font.render('Нажмите на пробел для того, чтобы начать игру', False, (0, 0, 0))
+menu3 = font.render('Авторы игры: Стефанов Никита Б02-302, Наумов Максим Б02-301', False, (0, 0, 0))
+menu4 = font.render('и Денисов Сергей Б02-309', False, (0, 0, 0))
+
+while runningmenu:
+    screen.fill((255, 0,0))
+    for event in pg.event.get():
+        if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+            runningmenu = False
+            running = True
+        if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            runningmenu = False
+            running = False
+
+
+    screen.blit(menu1, (300, 50))
+    screen.blit(menu2, (200, 150))
+    screen.blit(menu3, (10, 450))
+    screen.blit(menu4, (200, 500))
+
+
+    pg.display.update()
 while running:
     ticks = pg.time.get_ticks() / 200
     globaltime+=1
