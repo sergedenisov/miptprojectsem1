@@ -198,6 +198,8 @@ class GOBLIN:
         self.hor, self.vert = 1000, 1000
 
         self.alive = True
+        self.see = True
+        self.standing = True
 
         self.cycle = 0
 
@@ -217,19 +219,47 @@ class GOBLIN:
             self.vert = 300 + 300 * scaling - scaling * self.spritesize[1]
             self.hor = 400 - 800 * np.sin(self.diffspritean) - scaling * self.spritesize[0] / 2
             if self.alive:
-                self.spritesize = np.asarray(self.spritesheet[self.cycle].get_size())
-
-                self.newsprtie = pg.transform.scale(self.spritesheet[self.cycle], scaling * self.spritesize)
+                if self.standing:
+                    self.spritesize = np.asarray(self.spritesheet[0].get_size())
+                    self.newsprtie = pg.transform.scale(self.spritesheet[0], scaling * self.spritesize)
+                else:
+                    self.spritesize = np.asarray(self.spritesheet[self.cycle].get_size())
+                    self.newsprtie = pg.transform.scale(self.spritesheet[self.cycle], scaling * self.spritesize)
             else:
                 self.spritesize = np.asarray(self.spritesheet[4].get_size())
-
                 self.newsprtie = pg.transform.scale(self.spritesheet[4], scaling * self.spritesize)
+
+            self.see = True
 
             for i in range(int(dist / 0.01)):
                 x, y = x + cos, y + sin
                 if maph[int(x)][int(y)]:
                     self.hor, self.vert = 1000, 1000
+                    self.see = False
             self.screen.blit(self.newsprtie, (self.hor, self.vert))
+
+        dist = np.sqrt((posx - self.x)**2 + (posy - self.y)**2)
+        cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
+        if self.see and self.alive and dist > 1.5 and maph[int(self.x)][int(self.y)] == 0:
+            self.x += cos
+            self.y += sin
+            self.standing = False
+
+        if dist <= 1.5:
+            self.standing = True
+        if maph[int(self.x)][int(self.y)] != 0:
+            self.x -= 3 * cos
+            self.y -= 3 * sin
+
+        if self.standing and self.see:
+            self.spritesize = np.asarray(self.spritesheet[6].get_size())
+            self.newsprtie = pg.transform.scale(self.spritesheet[6], scaling * self.spritesize)
+            
+
+
+
+
+
     def hittest(self):
         self.diffspritean = (rot - self.spritean) % (2 * np.pi)
         if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
