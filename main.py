@@ -122,9 +122,13 @@ class HITLER:
         self.newsprtie = self.spritesheet[0]
         self.hor, self.vert = 1000, 1000
 
+        self.angle = 0
+
+
         self.alive = True
 
         self.cycle = 0
+
 
 
     def frame(self):
@@ -155,6 +159,22 @@ class HITLER:
                 if maph[int(x)][int(y)]:
                     self.hor, self.vert = 1000, 1000
             self.screen.blit(self.newsprtie, (self.hor, self.vert))
+        if self.alive:
+            self.move_circle()
+
+    def move_circle(self):
+
+        center_x, center_y = 5, 5
+
+        radius = 2
+
+        self.angle += np.radians(1)
+        self.angle %= 2 * np.pi
+
+        self.x = center_x + radius * np.cos(self.angle)
+        self.y = center_y + radius * np.sin(self.angle)
+
+
     def hittest(self):
         self.diffspritean = (rot - self.spritean) % (2 * np.pi)
         if self.diffspritean > 47 * np.pi / 24 or self.diffspritean < np.pi / 24:
