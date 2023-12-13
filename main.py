@@ -482,7 +482,7 @@ hwall = pg.surfarray.array3d(pg.transform.scale(pg.image.load('HWALL.jpg'), (300
 wsw = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WSW.png'), (300,300))) / 255
 walls = [wall, wall1, hwall, wsw]
 pillarpic = pg.transform.scale(pg.image.load('pillar.png'), (300,300))
-barrel = pg.transform.scale(pg.image.load('barrel.png'), (300,300))
+barrelpic = pg.transform.scale(pg.image.load('barrel.png'), (300,300))
 enemypic = pg.image.load('27846.png')
 enemysheet = [pg.transform.scale(pg.image.load('testenemy/1.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/2.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/3.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/4.png'),(200, 300)) , pg.transform.scale(pg.image.load('testenemy/5.png'),(150, 200))]
 enemysheetH = [pg.transform.scale(pg.image.load('HITLER/1.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/2.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/3.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/4.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/5.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/6.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/7.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/8.png'),(200, 300))]
@@ -497,12 +497,15 @@ e3 = GOBLIN(screen, enemysheetG, 4, 2)
 
 pg.event.set_grab(1)
 pillar = Sprite(screen, pillarpic, 3,3)
+barrel1 = Sprite(screen, barrelpic, 7,7)
 globaltime = 0
 runningmenu = True
-menu1 = font.render('RayCasting игра', False, (0, 0, 0))
-menu2 = font.render('Нажмите на пробел для того, чтобы начать игру', False, (0, 0, 0))
-menu3 = font.render('Авторы игры: Стефанов Никита Б02-302, Наумов Максим Б02-301', False, (0, 0, 0))
-menu4 = font.render('и Денисов Сергей Б02-309', False, (0, 0, 0))
+menu1 = font.render('RayCasting игра "Одолей фашизм!"', False, (0, 0, 0))
+menu2 = font.render('Нажмите на пробел для того, чтобы начать игру.', False, (0, 0, 0))
+menu3 = font.render('Авторы игры: Денисов Сергей Б02-309,', False, (0, 0, 0))
+menu4 = font.render('Наумов Максим Б02-301,', False, (0, 0, 0))
+menu5 = font.render('Стефанов Никита Б02-302', False, (0, 0, 0))
+menu6 = font.render('Нажмите на esc чтобы выйти из игры.', False, (0, 0, 0))
 
 while runningmenu:
     screen.fill((255, 0,0))
@@ -515,10 +518,12 @@ while runningmenu:
             running = False
 
 
-    screen.blit(menu1, (300, 50))
-    screen.blit(menu2, (200, 150))
-    screen.blit(menu3, (10, 450))
-    screen.blit(menu4, (200, 500))
+    screen.blit(menu1, (160, 50))
+    screen.blit(menu2, (50, 150))
+    screen.blit(menu3, (10, 350))
+    screen.blit(menu4, (220, 400))
+    screen.blit(menu5, (220, 450))
+    screen.blit(menu6, (50, 520))
 
 
     pg.display.update()
@@ -530,6 +535,31 @@ while running:
     if int(posx) == exitx and int(posy) == exity:
         print("you got out of the maze!")
         running = False
+    if health <=0:
+        deathscreen = True
+        menu1 = font.render('RayCasting игра "Одолей фашизм!"', False, (0, 0, 0))
+        menu2 = font.render('ВАС УБИЛИ!', False, (0, 0, 0))
+        menu3 = font.render('Нажмите пробел чтобы возродиться.', False, (0, 0, 0))
+        menu4 = font.render('Нажмите esc чтобы выйти.', False, (0, 0, 0))
+
+        while deathscreen:
+            screen.fill((255, 0, 0))
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                    deathscreen = False
+                    running = True
+                    health=100
+                if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                    running = False
+                    deathscreen = False
+
+            screen.blit(menu1, (160, 50))
+            screen.blit(menu2, (300, 150))
+            screen.blit(menu3, (50, 450))
+            screen.blit(menu4, (50, 500))
+
+            pg.display.update()
+
     for event in pg.event.get():
         if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
             running = False
@@ -571,6 +601,7 @@ while running:
             screen.blit(toiletnew, (hor, vert))'''
 
     pillar.frame()
+    barrel1.frame()
     e1.frame()
     e2.frame()
     e3.frame()
