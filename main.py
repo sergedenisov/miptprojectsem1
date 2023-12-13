@@ -89,11 +89,12 @@ class Enemy:
 
             self.screen.blit(self.newsprtie, (self.hor, self.vert))
         dist = np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
+        cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
         if self.see and self.alive and dist>0.5 and maph[int(self.x)][int(self.y)]==0:
             cos, sin = 0.01 * (posx - self.x) / dist, 0.01 * (posy - self.y) / dist
             self.x += cos
             self.y += sin
-            print(maph[int(self.x)][int(self.y)])
+
         if maph[int(self.x)][int(self.y)] !=0:
             self.x -= 3*cos
             self.y -= 3*sin
@@ -306,19 +307,32 @@ def movement(posx, posy, rot, maph, et):
     return posx, posy, rot
 
 
-def gen_map(size):
-    maph = np.array([[1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 1, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1]])
+def gen_map2(size):
+    maph = np.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+            [1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1],
+            [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+            [1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+            [1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+            [1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            ])
     '''
     maph = np.random.choice([0, 0, 0, 0, 1, 1], (size, size))
     maph[0, :], maph[size - 1, :], maph[:, 0], maph[:, size - 1] = (1, 1, 1, 1)'''
-    print(type(maph))
+
     posx, posy, rot = 1.5, 1.5, np.pi /2
 
     x, y = int(posx), int(posy)
@@ -342,10 +356,58 @@ def gen_map(size):
                 count = count + 1
     return posx, posy, rot, maph, exitx, exity
 
+def gen_map(size):
+    maph = np.array([[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 2, 2, 0, 2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 2],
+            [2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 0, 2, 2, 3, 2, 2, 2, 2, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 3, 2, 2, 0, 0, 3, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 2, 0, 0, 4, 0, 0, 0, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 2, 2, 4, 2, 4, 2, 2, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 3, 0, 0, 0, 0, 0, 4, 0, 0, 2, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 3, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 0, 2, 3, 2, 0, 0, 0, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+            ])
+    '''
+    maph = np.random.choice([0, 0, 0, 0, 1, 1], (size, size))
+    maph[0, :], maph[size - 1, :], maph[:, 0], maph[:, size - 1] = (1, 1, 1, 1)'''
 
+    posx, posy, rot = 1.5, 1.5, np.pi /2
+
+    x, y = int(posx), int(posy)
+    maph[x][y] = 0
+    count = 0
+    while True:
+        testx, testy = (x, y)
+        if np.random.uniform() > 0.5:
+            testx = testx + np.random.choice([-1, 1])
+        else:
+            testy = testy + np.random.choice([-1, 1])
+        if testx > 0 and testx < size - 1 and testy > 0 and testy < size - 1:
+            if maph[testx][testy] == 0 or count > 5:
+                count = 0
+                x, y = (testx, testy)
+                maph[x][y] = 0
+                if x == size - 2:
+                    exitx, exity = (x, y)
+                    break
+            else:
+                count = count + 1
+    return posx, posy, rot, maph, exitx, exity
 @njit()
-def new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, size, wall, exitx, exity):
+def new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, size, walls, exitx, exity):
     for i in range(hres):
+        walltype = 1
         rot_i = rot + np.deg2rad(i / mod - 30)
         sin, cos, cos2 = np.sin(rot_i), np.cos(rot_i), np.cos(np.deg2rad(i / mod - 30))
         frame[i][:] = sky[int(np.rad2deg(rot_i) % 359)][:]
@@ -353,6 +415,9 @@ def new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, siz
         x, y = posx, posy
         while maph[int(x) % (size - 1)][int(y) % (size - 1)] == 0:
             x, y = x + 0.01 * cos, y + 0.01 * sin
+        walltype = maph[int(x) % (size - 1)][int(y) % (size - 1)]
+
+
 
         n = abs((x - posx) / cos)
         h = int(halfvres / (n * cos2 + 0.001))
@@ -370,7 +435,7 @@ def new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, siz
 
         for k in range(h * 2):
             if halfvres - h + k >= 0 and halfvres - h + k < 2 * halfvres:
-                frame[i][halfvres - h + k] = wall[xx][int(yy[k])]
+                frame[i][halfvres - h + k] = walls[walltype-1][xx][int(yy[k])]
 
 
         for j in range(halfvres - h):
@@ -399,7 +464,7 @@ halfvres = 150  # vertical resolution/2
 
 mod = hres / 60  # scaling factor (60° fov)
 
-size = 8
+size = 20
 posx, posy, rot, maph, exitx, exity = gen_map(size)
 health = 100
 pg.font.init()
@@ -411,7 +476,13 @@ sky = pg.image.load('WALL30.bmp')
 sky = pg.surfarray.array3d(pg.transform.scale(sky, (360, halfvres * 2))) / 255
 floor = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL87.bmp'), (300,300))) / 255
 wall = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WALL32.bmp'), (300,300))) / 255
+wall1 = pg.surfarray.array3d(pg.transform.scale(pg.image.load('wall1.png'), (300,300))) / 255
+grass = pg.surfarray.array3d(pg.transform.scale(pg.image.load('grass.png'), (300,300))) / 255
+hwall = pg.surfarray.array3d(pg.transform.scale(pg.image.load('HWALL.jpg'), (300,300))) / 255
+wsw = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WSW.png'), (300,300))) / 255
+walls = [wall, wall1, hwall, wsw]
 pillarpic = pg.transform.scale(pg.image.load('pillar.png'), (300,300))
+barrel = pg.transform.scale(pg.image.load('barrel.png'), (300,300))
 enemypic = pg.image.load('27846.png')
 enemysheet = [pg.transform.scale(pg.image.load('testenemy/1.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/2.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/3.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/4.png'),(200, 300)) , pg.transform.scale(pg.image.load('testenemy/5.png'),(150, 200))]
 enemysheetH = [pg.transform.scale(pg.image.load('HITLER/1.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/2.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/3.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/4.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/5.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/6.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/7.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/8.png'),(200, 300))]
@@ -471,7 +542,7 @@ while running:
 
 
     frame = new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, size,
-                      wall, exitx, exity)
+                      walls, exitx, exity)
 
     surf = pg.surfarray.make_surface(frame * 255)
     surf = pg.transform.scale(surf, (800, 600))
