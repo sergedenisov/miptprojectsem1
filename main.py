@@ -699,5 +699,126 @@ while running:
 
     posx, posy, rot = movement(posx, posy, rot, maph, 0.04)
     clock.tick(60)
+#INTERMINSIN
+menu1 = font.render('Вы закончили первый уровень', False, (0, 0, 0))
+menu2 = font.render('Нажмите на пробель чтобы начать следуйщий', False, (0, 0, 0))
+
+runningmenu = True
+while runningmenu:
+    screen.fill((255, 0,0))
+    for event in pg.event.get():
+        if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+            runningmenu = False
+            running = True
+        if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            runningmenu = False
+            running = False
+
+
+    screen.blit(menu1, (160, 50))
+    screen.blit(menu2, (50, 150))
+
+
+
+    pg.display.update()
+
+
+#SECOND LEVEL
+enemylist2 = [Enemy(screen, enemysheet, 2, 2), Enemy(screen, enemysheet, 3, 4), Enemy(screen, enemysheet, 3, 5), Enemy(screen, enemysheet, 6, 7), GOBLIN(screen, enemysheetG, 13, 9), GOBLIN(screen, enemysheetG, 14, 2), GOBLIN(screen, enemysheetG, 11, 9)]
+
+posx, posy, rot, maph, exitx, exity = gen_map2(size)
+health = 100
+running = True
+while running:
+    ticks = pg.time.get_ticks() / 200
+    globaltime+=1
+    globaltime%=60
+
+    if int(posx) == exitx and int(posy) == exity:
+        print("you got out of the maze!")
+        running = False
+    if health <=0:
+        deathscreen = True
+        menu1 = font.render('RayCasting игра "Одолей фашизм!"', False, (0, 0, 0))
+        menu2 = font.render('ВАС УБИЛИ!', False, (0, 0, 0))
+        menu3 = font.render('Нажмите пробел чтобы возродиться.', False, (0, 0, 0))
+        menu4 = font.render('Нажмите esc чтобы выйти.', False, (0, 0, 0))
+
+        while deathscreen:
+            screen.fill((255, 0, 0))
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                    deathscreen = False
+                    running = True
+                    health=100
+                if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                    running = False
+                    deathscreen = False
+
+            screen.blit(menu1, (160, 50))
+            screen.blit(menu2, (300, 150))
+            screen.blit(menu3, (50, 450))
+            screen.blit(menu4, (50, 500))
+
+            pg.display.update()
+
+    for event in pg.event.get():
+        if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            running = False
+        if event.type == pg.MOUSEBUTTONDOWN:
+            weapontest.shoot()
+            for i in enemylist1:
+                i.hittest()
+            e1.hittest()
+            e2.hittest()
+            e3.hittest()
+
+
+
+    frame = new_frame(posx, posy, rot, frame, sky, floor, hres, halfvres, mod, maph, size,
+                      walls, exitx, exity)
+
+    surf = pg.surfarray.make_surface(frame * 255)
+    surf = pg.transform.scale(surf, (800, 600))
+    fps = int(clock.get_fps())
+    pg.display.set_caption("Pycasting maze - FPS: " + str(fps))
+
+    screen.blit(surf, (0, 0))
+
+    for i in enemylist1:
+        i.frame()
+        if type(i) == Enemy:
+            if i.isalive() and i.distance() <= 1 and globaltime % 20 == 0:
+                health -= 1
+        if type(i) == GOBLIN:
+            if i.isshooting() and i.isalive() and i.distance() <=1.5:
+                # if random.Random(10) == 1:
+                health -= 0.5
+
+
+
+
+    pillar.frame()
+    barrel1.frame()
+    e1.frame()
+    e2.frame()
+    e3.frame()
+    weapontest.frame()
+
+    if e1.isalive() and e1.distance() <= 1 and globaltime%20 == 0:
+        health -= 1
+    if e3.isshooting() and e3.isalive() and e3.distance()<=1.5:
+        #if random.Random(10) == 1:
+       health -=0.5
+
+    hptext = font.render('HP: %d' % health, False, (0, 0, 0))
+
+    screen.blit(hptext, (20, 550))
+
+    pg.display.update()
+
+    posx, posy, rot = movement(posx, posy, rot, maph, 0.04)
+    clock.tick(60)
+
 
 pg.quit()

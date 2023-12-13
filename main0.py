@@ -20,7 +20,7 @@ player_y = int(SCREEN_HEIGHT / 4)
 player_an = math.pi
 player_speed = 3
 
-dog_surf = pygame.image.load('unnamed.bmp')
+dog_surf = pygame.image.load('WALL32.bmp')
 dog_surf = pygame.transform.scale(dog_surf, (512, 512))
 
 #MAP
