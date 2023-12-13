@@ -3,6 +3,7 @@ import random
 import pygame as pg
 import numpy as np
 from numba import njit
+from random import randint as rnd
 
 
 
@@ -319,7 +320,12 @@ class Weapon:
         self.shooting = True
         self.time = 0
 
-
+class Medicine(Sprite):
+    def reposition(self):
+        self.x = rnd (1, 19)
+        self.y = rnd (1, 19)
+class Barrel(Medicine):
+    pass
 
 
 
@@ -534,6 +540,7 @@ wsw = pg.surfarray.array3d(pg.transform.scale(pg.image.load('WSW.png'), (300,300
 walls = [wall, wall1, hwall, wsw]
 pillarpic = pg.transform.scale(pg.image.load('pillar.png'), (300,300))
 barrelpic = pg.transform.scale(pg.image.load('barrel.png'), (300,300))
+medicinepic = pg.transform.scale(pg.image.load('medicine.png'), (300,300))
 enemypic = pg.image.load('27846.png')
 enemysheet = [pg.transform.scale(pg.image.load('testenemy/1.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/2.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/3.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/4.png'),(200, 300)) , pg.transform.scale(pg.image.load('testenemy/5.png'),(150, 200))]
 enemysheetH = [pg.transform.scale(pg.image.load('HITLER/1.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/2.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/3.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/4.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/5.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/6.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/7.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/8.png'),(200, 300))]
@@ -546,11 +553,19 @@ e1 = Enemy(screen, enemysheet, 2, 2)
 e2 = HITLER(screen, enemysheetH, 5,5)
 e3 = GOBLIN(screen, enemysheetG, 4, 2)
 
-enemylist1 = [Enemy(screen, enemysheet, 2, 2), Enemy(screen, enemysheet, 3, 4), Enemy(screen, enemysheet, 3, 5), Enemy(screen, enemysheet, 6, 7), GOBLIN(screen, enemysheetG, 13, 9), GOBLIN(screen, enemysheetG, 14, 2), GOBLIN(screen, enemysheetG, 11, 9)]
+enemylist1 = [Enemy(screen, enemysheet, 2, 9), Enemy(screen, enemysheet, 1, 9), Enemy(screen, enemysheet, 2, 4), Enemy(screen, enemysheet, 18, 18), Enemy(screen, enemysheet, 6, 18), Enemy(screen, enemysheet, 6, 7), Enemy(screen, enemysheet, 18, 13), Enemy(screen, enemysheet, 18, 7), GOBLIN(screen, enemysheetG, 13, 9), GOBLIN(screen, enemysheetG, 14, 2), GOBLIN(screen, enemysheetG, 11, 9), GOBLIN(screen, enemysheetG, 11, 18)]
 
 pg.event.set_grab(1)
 pillar = Sprite(screen, pillarpic, 3,3)
-barrel1 = Sprite(screen, barrelpic, 7,7)
+barrel1 = Barrel(screen, barrelpic, rnd(1, 19), rnd(1, 19))
+barrel2 = Barrel(screen, barrelpic, rnd(1, 19), rnd(1, 19))
+barrel3 = Barrel(screen, barrelpic, rnd(1, 19), rnd(1, 19))
+medicine1 = Medicine(screen, medicinepic, rnd(1, 19), rnd(1, 19))
+medicine2 = Medicine(screen, medicinepic, rnd(1, 19), rnd(1, 19))
+medicine3 = Medicine(screen, medicinepic, rnd(1, 19), rnd(1, 19))
+barreles=[barrel1, barrel2, barrel3]
+medicines=[medicine1, medicine2, medicine3]
+
 globaltime = 0
 runningmenu = True
 menu1 = font.render('RayCasting игра "Одолей фашизм!"', False, (0, 0, 0))
@@ -612,6 +627,15 @@ while running:
             screen.blit(menu4, (50, 500))
 
             pg.display.update()
+    for k in medicines:
+        if (posx - k.x) ** 2 + (posy - k.y) ** 2 <= 1:
+            health += rnd(5, 30)
+            k.reposition()
+    for m in barreles:
+        if (posx - m.x) ** 2 + (posy - m.y) ** 2 <= 1:
+            health -= rnd(10, 50)
+            m.reposition()
+            
 
     for event in pg.event.get():
         if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
@@ -651,6 +675,11 @@ while running:
 
     pillar.frame()
     barrel1.frame()
+    barrel2.frame()
+    barrel3.frame()
+    medicine1.frame()
+    medicine2.frame()
+    medicine3.frame()
     e1.frame()
     e2.frame()
     e3.frame()
