@@ -1,3 +1,5 @@
+import random
+
 import pygame as pg
 import numpy as np
 from numba import njit
@@ -167,7 +169,7 @@ class HITLER:
 
         center_x, center_y = 5, 5
 
-        radius = 2
+        radius = 0.5
 
         self.angle += np.radians(1)
         self.angle %= 2 * np.pi
@@ -200,6 +202,9 @@ class GOBLIN:
         self.alive = True
         self.see = True
         self.standing = True
+        self.shooting = False
+
+        self.time = 0
 
         self.cycle = 0
 
@@ -222,6 +227,18 @@ class GOBLIN:
                 if self.standing:
                     self.spritesize = np.asarray(self.spritesheet[0].get_size())
                     self.newsprtie = pg.transform.scale(self.spritesheet[0], scaling * self.spritesize)
+                    self.time+=1
+                    if self.time >= 120:
+                        self.shooting = True
+                        self.time = 0
+                    if self.time <20 and self.shooting:
+                        self.spritesize = np.asarray(self.spritesheet[5].get_size())
+                        self.newsprtie = pg.transform.scale(self.spritesheet[5], scaling * self.spritesize)
+                    if self.time >=20 and self.shooting:
+                        self.shooting = False
+                        self.time = 0
+
+
                 else:
                     self.spritesize = np.asarray(self.spritesheet[self.cycle].get_size())
                     self.newsprtie = pg.transform.scale(self.spritesheet[self.cycle], scaling * self.spritesize)
@@ -250,10 +267,14 @@ class GOBLIN:
         if maph[int(self.x)][int(self.y)] != 0:
             self.x -= 3 * cos
             self.y -= 3 * sin
+    def isshooting(self):
+        return self.shooting
+    def isalive(self):
+        return self.alive
+    def distance(self):
+        return np.sqrt((posx - self.x) ** 2 + (posy - self.y) ** 2)
 
-        if self.standing and self.see:
-            self.spritesize = np.asarray(self.spritesheet[6].get_size())
-            self.newsprtie = pg.transform.scale(self.spritesheet[6], scaling * self.spritesize)
+
             
 
 
@@ -516,7 +537,7 @@ barrelpic = pg.transform.scale(pg.image.load('barrel.png'), (300,300))
 enemypic = pg.image.load('27846.png')
 enemysheet = [pg.transform.scale(pg.image.load('testenemy/1.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/2.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/3.png'),(200, 300)), pg.transform.scale(pg.image.load('testenemy/4.png'),(200, 300)) , pg.transform.scale(pg.image.load('testenemy/5.png'),(150, 200))]
 enemysheetH = [pg.transform.scale(pg.image.load('HITLER/1.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/2.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/3.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/4.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/5.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/6.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/7.png'),(200, 300)), pg.transform.scale(pg.image.load('HITLER/8.png'),(200, 300))]
-enemysheetG = [pg.transform.scale(pg.image.load('enemys/1.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/2.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/3.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/4.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/5.png'),(200, 300))]
+enemysheetG = [pg.transform.scale(pg.image.load('enemys/1.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/2.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/3.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/4.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/5.png'),(200, 300)), pg.transform.scale(pg.image.load('enemys/7.png'),(200, 300))]
 
 weaponsheet = [pg.transform.scale(pg.image.load('1.png'),(150, 150)), pg.transform.scale(pg.image.load('2.png'),(150, 150))]
 weapontest = Weapon(screen,weaponsheet, 350, 450)
@@ -524,6 +545,8 @@ weapontest = Weapon(screen,weaponsheet, 350, 450)
 e1 = Enemy(screen, enemysheet, 2, 2)
 e2 = HITLER(screen, enemysheetH, 5,5)
 e3 = GOBLIN(screen, enemysheetG, 4, 2)
+
+enemylist1 = [Enemy(screen, enemysheet, 2, 2), Enemy(screen, enemysheet, 3, 4), Enemy(screen, enemysheet, 3, 5), Enemy(screen, enemysheet, 6, 7), GOBLIN(screen, enemysheetG, 13, 9), GOBLIN(screen, enemysheetG, 14, 2), GOBLIN(screen, enemysheetG, 11, 9)]
 
 pg.event.set_grab(1)
 pillar = Sprite(screen, pillarpic, 3,3)
@@ -595,6 +618,8 @@ while running:
             running = False
         if event.type == pg.MOUSEBUTTONDOWN:
             weapontest.shoot()
+            for i in enemylist1:
+                i.hittest()
             e1.hittest()
             e2.hittest()
             e3.hittest()
@@ -611,24 +636,18 @@ while running:
 
     screen.blit(surf, (0, 0))
 
-    '''toiletan = np.arctan((toilety - posy)/(toiletx - posx))
-        if abs(posx+np.cos(toiletan) -toiletx) > abs(posx - toiletx):
-            toiletan = (toiletan - np.pi)%(2*np.pi)
-        difftoiletan = (rot - toiletan)%(2*np.pi)
-        if difftoiletan > 11*np.pi/6 or difftoiletan < np.pi/6:
-            dist = np.sqrt((posx-toiletx)**2 + (posy- toilety)**2)
-            cos2 = np.cos(difftoiletan)
-            cos, sin = 0.01*(posx - toiletx)/dist, 0.01*(posy - toilety)/dist
-            x, y = toiletx, toilety
-            scaling = min(1/dist, 2) / cos2
-            vert = 300 + 300*scaling - scaling*toiletsize[1]/2
-            hor = 400 - 800*np.sin(difftoiletan)- scaling*toiletsize[0]/2
-            toiletnew = pg.transform.scale(toilet, scaling*toiletsize)
-            for i in range(int(dist/0.01)):
-                x, y = x+cos, y+sin
-                if maph[int(x)][int(y)]:
-                    toiletnew = pg.transform.scale(toilet, (0,0))
-            screen.blit(toiletnew, (hor, vert))'''
+    for i in enemylist1:
+        i.frame()
+        if type(i) == Enemy:
+            if i.isalive() and i.distance() <= 1 and globaltime % 20 == 0:
+                health -= 1
+        if type(i) == GOBLIN:
+            if i.isshooting() and i.isalive() and i.distance() <=1.5:
+                # if random.Random(10) == 1:
+                health -= 0.5
+
+
+
 
     pillar.frame()
     barrel1.frame()
@@ -636,8 +655,13 @@ while running:
     e2.frame()
     e3.frame()
     weapontest.frame()
+
     if e1.isalive() and e1.distance() <= 1 and globaltime%20 == 0:
         health -= 1
+    if e3.isshooting() and e3.isalive() and e3.distance()<=1.5:
+        #if random.Random(10) == 1:
+       health -=0.5
+
     hptext = font.render('HP: %d' % health, False, (0, 0, 0))
 
     screen.blit(hptext, (20, 550))
